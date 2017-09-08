@@ -1,0 +1,371 @@
+<html>
+<head>
+<title>Homework-3</title>
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+ 
+<script type="text/javascript" src="http://code.jquery.com/jquery-3.1.1.js"></script> 
+<script type="text/javascript" src="js/canvasjs.min.js"></script></head>
+<script type="text/javascript" src="js/test.js"></script></head>
+</head>
+<body style="background-image: url('Clouds.jpg');background-size: 100% 100%; ">
+<div style="text-align: center;font: bold; ">
+<h2 style="text-align: center;">Homework-3</h2>
+
+
+Enter Date: <input name="datevalue" id="datevalue" type="date" style="background-color: #3CBC8D;color: white;">
+City: <input name="city" id="city" type="text" style="background-color: #3CBC8D;color: white;">
+<p><input id="myButton" value="Forecast" type="submit" /></p>
+<p><input id="myButton2" value="Forecast from Java" type="submit" /></p>
+<p><button type="button" id="forecast"  onclick="forecast()" />Forecast-Bonus</button></p>
+
+
+<p><div id="myOutput" style="text-align: center;"> </div><p>
+<center>
+  <div id="chartContainer" style="height: 300px; width: 50%; ">
+  </div>
+</center>
+
+
+
+
+ <p><div id="myOutput2" style="text-align: center;"> </div><p>
+<center>
+  <div id="chartContainer3" style="height: 300px; width: 50%; ">
+  </div>
+</center>
+
+
+
+<!-- <p><input id="myClearButton" value="Clear Artist" type="submit" /></p>
+ -->
+
+<br>
+<br>	
+<p><div id="bonusmyOutput"></div><p>
+<br>
+<br>	
+	
+<center>
+  <div id="chartContainer2" style="height: 300px; width: 50%; ">
+  </div>
+	</center>
+	
+</div>		
+<script type="text/javascript">
+
+ $("#myButton").click(function() {
+	 	var date = document.getElementById('datevalue').value;
+	 	
+	 	console.log(date);	 	 	
+	 	var formattedDate = new Date(date);
+	 	formattedDate.setDate(formattedDate.getDate()+1);
+	 	console.log(formattedDate);
+	 	var d = formattedDate.getDate();
+	 	var m =  formattedDate.getMonth();
+	 	m += 1;  // JavaScript months are 0-11
+	 	var y = formattedDate.getFullYear();
+	 	date = y + "" + (m>9 ? '' : '0') + m + "" + (d>9 ? '' : '0') + d;
+	 	console.log(date);
+        //var artistURL = "http://localhost:8080/WeatherHostingAPI/rest/ReportService/forecast/"+date;
+		var artistURL = "http://www.suggalvn.online/WeatherHostingAPI/rest/ReportService/forecast/"+date;
+        var returnData = "";
+        
+        if(!(formattedDate instanceof Date && !isNaN(formattedDate.valueOf())))
+        	{
+        	
+        	 $("div#myOutput").html("Enter a valid Date");
+        	return(false);
+        	}
+        if(!(y < 2020))
+        	{
+        	 $("div#myOutput").html("Enter a valid Date before 2020");
+         	return(false);
+        	}
+        
+        
+        $.ajax({
+            type: "GET",
+            dataType: "json",
+            async: true,
+            url: artistURL,
+            crossDomain: true,
+            error: function(request, status, error) { alert(request.responseText) },
+            success: function(data) {
+                //$("div#myOutput").html(" ");
+                var datearr = []
+                var tmaxarr = [];
+                var tminarr = []
+               // data = jQuery.parseJSON(data);
+                //data = JSON.parse(data);
+  				//var jsonObject = $.parseJSON(data); //Only if not already an object
+  				returnData = "<center><table style='font-size:12pt;'><tr><th>DATE</th><th>TMAX</th><th>TMIN</th></tr>";
+				 $.each(data, function (i, item) {
+					 returnData += "<tr><td>" +	data[i]["DATE"] + "</td><td align='right'>"
+					 			+ " " + data[i]["TMAX"] + "</td><td align='right'>"
+					 			+ data[i]["TMIN"] + "</td></tr>";
+					 	
+				    	tmaxarr.push(data[i]["TMAX"]);
+				    	tminarr.push(data[i]["TMIN"]);
+				    	datearr.push(data[i]["DATE"])
+					 			
+					 			
+				}); 
+				 returnData = returnData + "</table></center>";
+  				console.log(tmaxarr[0]);
+				console.log(tmaxarr);
+				console.log(tminarr);
+				console.log(datearr);
+					    var chart = new CanvasJS.Chart("chartContainer",
+					    {
+					      title:{
+					      text: "Weather Hosting"  
+					      },
+					      animationEnabled: true,
+					      toolTip:{
+	                          shared:true
+	                        },
+					      theme: "theme2",
+					      legend:{
+								verticalAlign: "center",
+								horizontalAlign: "right"
+							},
+					      data: [
+					      {        
+					        type: "line",
+					        showInLegend: true,
+							lineThickness: 2,
+							name: "TMIN",
+							markerType: "square",
+							color: "#F08080",
+					        dataPoints: [
+					        { label: parseInt(datearr[0]), y: tminarr[0] },
+					        { label: parseInt(datearr[1]), y: tminarr[1] },
+					        { label: parseInt(datearr[2]), y: tminarr[2] },
+					        { label: parseInt(datearr[3]), y: tminarr[3] },
+					        { label: parseInt(datearr[4]), y: tminarr[4] },
+					        { label: parseInt(datearr[5]), y: tminarr[5] },
+					        { label: parseInt(datearr[6]), y: tminarr[6] },
+					        
+					      
+					        ]
+					      },
+					        {        
+					        type: "line",
+					        showInLegend: true,
+							name: "TMAX",
+							color: "#20B2AA",
+							lineThickness: 2,
+					        dataPoints: [
+					        { label: parseInt(datearr[0]), y: tmaxarr[0] },
+					        { label: parseInt(datearr[1]), y: tmaxarr[1] },
+					        { label: parseInt(datearr[2]), y: tmaxarr[2] },
+					        { label: parseInt(datearr[3]), y: tmaxarr[3] },
+					        { label: parseInt(datearr[4]), y: tmaxarr[4] },
+					        { label: parseInt(datearr[5]), y: tmaxarr[5] },
+					        { label: parseInt(datearr[6]), y: tmaxarr[6] },
+					        
+					      
+					        ]
+					      },        
+					      ],
+				          legend:{
+				              cursor:"pointer",
+				              itemclick:function(e){
+				                if (typeof(e.dataSeries.visible) === "undefined" || e.dataSeries.visible) {
+				                	e.dataSeries.visible = false;
+				                }
+				                else{
+				                  e.dataSeries.visible = true;
+				                }
+				                $("div#myOutput").html(chart.render());
+
+				              }
+				          }
+					    });
+
+				 $("div#myOutput").html(chart.render());
+				$("div#myOutput").html(returnData);
+            }
+        });
+        
+        return (false);
+    });
+ $("#myButton2").click(function() {
+	 	var date = document.getElementById('datevalue').value;
+	 	var city = document.getElementById('city').value;
+	 	console.log(date);	 	 	
+	 	var formattedDate = new Date(date);
+	 	formattedDate.setDate(formattedDate.getDate()+1);
+	 	console.log(formattedDate);
+	 	var d = formattedDate.getDate();
+	 	var m =  formattedDate.getMonth();
+	 	m += 1;  // JavaScript months are 0-11
+	 	var y = formattedDate.getFullYear();
+	 	date = y + "" + (m>9 ? '' : '0') + m + "" + (d>9 ? '' : '0') + d;
+	 	console.log(date);
+	 	
+	 	
+	 	 var result = []
+	 	 var apiurl = "http://apidev.accuweather.com/locations/v1/search?q="+city+"&apikey=hoArfRosT1215";
+   	 	 $.ajaxSetup({
+   	         async: false
+   	     });
+
+   	        $.ajax({
+   	            type: "GET",
+   	            dataType: "json",
+   	            async: false,
+   	            url: apiurl,
+   	            error: function(request, status, error) { alert(request.responseText) },
+   	            success: function(data) {
+   	            console.log(data);
+   				result[0]=data[0].GeoPosition.Latitude;
+   				result[1]=data[0].GeoPosition.Longitude;
+   				//result.push(data[0].GeoPosition.Latitude);
+   				
+   				console.log(result[0]);
+   				console.log(result[1]);
+   				
+   				
+   	         }
+            }); 
+   	       
+	 	
+	 	
+	 	
+    // var artistURL = "http://localhost:8080/WeatherHostingAPI/rest/ReportService/arcusforecast/"+date+"/"+result[0]+"/"+result[1];
+	var artistURL = "http://www.suggalvn.online/WeatherHostingAPI/rest/ReportService/arcusforecast/"+date+"/"+result[0]+"/"+result[1];
+     var returnData = "";
+     
+     if(!(formattedDate instanceof Date && !isNaN(formattedDate.valueOf())))
+     	{
+     	
+     	 $("div#myOutput2").html("Enter a valid Date");
+     	return(false);
+     	}
+     if(!(y < 2020))
+     	{
+     	 $("div#myOutput2").html("Enter a valid Date before 2020");
+      	return(false);
+     	}
+     
+     
+     $.ajax({
+         type: "GET",
+         dataType: "json",
+         async: true,
+         url: artistURL,
+         crossDomain: true,
+         error: function(request, status, error) { alert(request.responseText) },
+         success: function(data) {
+             //$("div#myOutput").html(" ");
+             var datearr = []
+             var tmaxarr = [];
+             var tminarr = []
+            // data = jQuery.parseJSON(data);
+             //data = JSON.parse(data);
+				//var jsonObject = $.parseJSON(data); //Only if not already an object
+				returnData = "<center><table style='font-size:12pt;'><tr><th>DATE</th><th>TMAX</th><th>TMIN</th></tr>";
+				 $.each(data, function (i, item) {
+					 returnData += "<tr><td>" +	data[i]["DATE"] + "</td><td align='right'>"
+					 			+ " " + data[i]["TMAX"] + "</td><td align='right'>"
+					 			+ data[i]["TMIN"] + "</td></tr>";
+					 	
+				    	tmaxarr.push(data[i]["TMAX"]);
+				    	tminarr.push(data[i]["TMIN"]);
+				    	datearr.push(data[i]["DATE"])
+					 			
+					 			
+				}); 
+				 returnData = returnData + "</table></center>";
+				console.log(tmaxarr[0]);
+				console.log(tmaxarr);
+				console.log(tminarr);
+				console.log(datearr);
+					    var chart = new CanvasJS.Chart("chartContainer3",
+					    {
+					      title:{
+					      text: "Weather Hosting"  
+					      },
+					      animationEnabled: true,
+					      toolTip:{
+	                          shared:true
+	                        },
+					      theme: "theme2",
+					      legend:{
+								verticalAlign: "center",
+								horizontalAlign: "right"
+							},
+					      data: [
+					      {        
+					        type: "line",
+					        showInLegend: true,
+							lineThickness: 2,
+							name: "TMIN",
+							markerType: "square",
+							color: "#F08080",
+					        dataPoints: [
+					        { label: parseInt(datearr[6]), y: tminarr[6] },
+					        { label: parseInt(datearr[5]), y: tminarr[5] },
+					        { label: parseInt(datearr[4]), y: tminarr[4] },
+					        { label: parseInt(datearr[3]), y: tminarr[3] },
+					        { label: parseInt(datearr[2]), y: tminarr[2] },
+					        { label: parseInt(datearr[1]), y: tminarr[1] },
+					        { label: parseInt(datearr[0]), y: tminarr[0] },
+					        
+					      
+					        ]
+					      },
+					        {        
+					        type: "line",
+					        showInLegend: true,
+							name: "TMAX",
+							color: "#20B2AA",
+							lineThickness: 2,
+					        dataPoints: [
+					        { label: parseInt(datearr[6]), y: tmaxarr[6] },
+					        { label: parseInt(datearr[5]), y: tmaxarr[5] },
+					        { label: parseInt(datearr[4]), y: tmaxarr[4] },
+					        { label: parseInt(datearr[3]), y: tmaxarr[3] },
+					        { label: parseInt(datearr[2]), y: tmaxarr[2] },
+					        { label: parseInt(datearr[1]), y: tmaxarr[1] },
+					        { label: parseInt(datearr[0]), y: tmaxarr[0] },
+					        
+					      
+					        ]
+					      },        
+					      ],
+				          legend:{
+				              cursor:"pointer",
+				              itemclick:function(e){
+				                if (typeof(e.dataSeries.visible) === "undefined" || e.dataSeries.visible) {
+				                	e.dataSeries.visible = false;
+				                }
+				                else{
+				                  e.dataSeries.visible = true;
+				                }
+				                $("div#myOutput2").html(chart.render());
+
+				              }
+				          }
+					    });
+
+				 $("div#myOutput2").html(chart.render());
+				$("div#myOutput2").html(returnData);
+         }
+     });
+     
+     return (false);
+ });
+
+</script>
+<!-- <script type="text/javascript">
+ $("#myClearButton").click(function() {
+        $(document).html("");
+        return (false);
+    });
+ 
+</script> -->
+
+</body>
+</html>
